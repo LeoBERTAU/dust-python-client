@@ -1,0 +1,32 @@
+[project]
+name = "dust-sdk"
+version = "0.1.0"
+description = "Unofficial Python SDK for Dust (dust.tt)"
+authors = [
+    { name = "Leo Bertau", email = "leobertau@hotmail.fr" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourname/dust-sdk"
+Repository = "https://github.com/yourname/dust-sdk"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
