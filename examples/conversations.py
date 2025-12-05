@@ -2,8 +2,8 @@
 
 from dotenv import load_dotenv
 
-from dust_sdk import DustClient, DustConfig
-from dust_sdk.conversations.models import MessageMention, MessageMentionContext, MessageContext
+from dust_client import DustClient, DustConfig
+from dust_client.conversations.models import MessageMention, MessageMentionContext, MessageContext
 
 
 def main() -> None:

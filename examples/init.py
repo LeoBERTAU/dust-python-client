@@ -1,6 +1,6 @@
-# examples/init_client.py
+# examples/init.py
 
-from dust_sdk import DustClient, DustConfig, DustError, DustAPIError
+from dust_client import DustClient, DustConfig, DustError, DustAPIError
 
 
 def main() -> None:

@@ -1,7 +1,7 @@
 [project]
-name = "dust-sdk"
+name = "dust-client"
 version = "0.1.0"
-description = "Unofficial Python SDK for Dust (dust.tt)"
+description = "Unofficial Python Client for Dust (dust.tt)"
 authors = [
     { name = "Leo Bertau", email = "leobertau@hotmail.fr" }
 ]
@@ -9,17 +9,36 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
 dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "python-dotenv",
+]
+
 [project.urls]
-Homepage = "https://github.com/yourname/dust-sdk"
-Repository = "https://github.com/yourname/dust-sdk"
+Homepage = "https://github.com/LeoBERTAU/dust-python-client"
+Repository = "https://github.com/LeoBERTAU/dust-python-client"
+Issues = "https://github.com/LeoBERTAU/dust-python-client/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+license-files = []
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -30,3 +49,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 88
 target-version = "py39"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

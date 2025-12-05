@@ -55,7 +55,7 @@ pip install -e .
 
 ### (Future) Installation from PyPI
 ```
-pip install dust-sdk
+pip install dust-client
 ```
 *Not available yet — will be published once we reach a stable alpha.*
 
@@ -104,7 +104,7 @@ If a key is lost, revoke it and create a new one.
 #### Option A — Explicit configuration
 
 ```python
-from dust_sdk import DustClient, DustConfig
+from dust_client import DustClient, DustConfig
 
 config = DustConfig(
     workspace_id="YOUR_WORKSPACE_ID_HERE",
@@ -122,7 +122,7 @@ export DUST_API_KEY=YOUR_API_KEY_HERE
 ```
 
 ```python
-from dust_sdk import DustClient, DustConfig
+from dust_client import DustClient, DustConfig
 
 config = DustConfig.from_env()
 client = DustClient(config)

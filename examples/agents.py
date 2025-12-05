@@ -1,7 +1,7 @@
 # examples/agents.py
 
 from dotenv import load_dotenv
-from dust_sdk import DustClient, DustConfig, DustAPIError
+from dust_client import DustClient, DustConfig, DustAPIError
 
 
 # Initialize DustClient from environment variables

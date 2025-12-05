@@ -9,6 +9,7 @@ import httpx
 from .config import DustConfig
 from .agents.client import AgentsClient
 from .conversations.client import ConversationsClient
+from .chat.client import ChatClient
 from .exceptions import (
     DustError,
     map_status_to_error,
@@ -65,6 +66,11 @@ class DustClient:
         )
         self.conversations = ConversationsClient(
             client=self,
+        )
+        self.chat = ChatClient(
+            conversations=self.conversations,
+            agents=self.agents,
+            config=self._config,
         )
 
         if validate_on_init:
