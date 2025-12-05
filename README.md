@@ -345,7 +345,7 @@ For a deeper explanation of the conversation model and the roles of:
 - `MessageMention`
 - `MessageMentionContext`
 
-see: [`docs/conversations.md`](docs/conversations.md)
+see: [`docs/conversations.md`](docs/examples/conversations.md)
 
 ### Basic example
 

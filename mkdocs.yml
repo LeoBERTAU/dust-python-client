@@ -1,0 +1,38 @@
+site_name: Dust Python Client
+site_description: Unofficial Python Client for Dust (dust.tt)
+site_author: Leo Bertau
+repo_url: https://github.com/LeoBERTAU/dust-python-client
+repo_name: LeoBERTAU/dust-python-client
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.instant
+    - content.code.copy
+    - toc.integrate
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quickstart: quickstart.md
+  - Usage:
+      - Overview: usage.md
+  - Examples:
+      - Agents: examples/agents.md
+      - Conversations: examples/conversations.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - toc:
+      permalink: true
+  - tables
+  - fenced_code
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/LeoBERTAU/dust-python-client
+      name: GitHub
