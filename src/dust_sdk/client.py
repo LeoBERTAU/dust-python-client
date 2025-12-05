@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import httpx
 
-from .agents.client import AgentsClient
 from .config import DustConfig
+from .agents.client import AgentsClient
+from .conversations.client import ConversationsClient
 from .exceptions import (
     DustError,
-    DustAPIError,
     map_status_to_error,
 )
-
 
 __all__ = ["DustClient"]
 
@@ -60,7 +59,11 @@ class DustClient:
             headers=headers,
         )
 
+        # Set sub clients
         self.agents = AgentsClient(
+            client=self,
+        )
+        self.conversations = ConversationsClient(
             client=self,
         )
 
