@@ -1,7 +1,6 @@
-# dust_sdk/chat/client.py
-
 from __future__ import annotations
 
+import time
 from typing import Optional, TYPE_CHECKING
 
 from ..config import DustConfig
@@ -11,8 +10,10 @@ from ..conversations.models import (
     MessageContext,
     MessageMention,
     MessageMentionContext,
+    ConversationEventType,
 )
 from .models import ChatMessage, ChatResponse
+from .exceptions import ChatError
 
 if TYPE_CHECKING:
     from ..conversations.client import ConversationsClient
@@ -64,18 +65,11 @@ class ChatSession:
     def title(self) -> Optional[str]:
         return self._title
 
-    def send(
-        self,
-        text: str,
-    ) -> ChatResponse:
+    def send(self, text: str) -> ChatResponse:
         """
         Send a message within this session's conversation using the bound agent.
 
-        Currently blocking-only: we wait for the message to be accepted, and
-        return a ChatResponse describing the user message.
-
-        In a future iteration, this will also attach the assistant_message once
-        we aggregate conversation events.
+        This is blocking: it waits for the assistant reply using the events stream.
         """
         return self._chat_client._send_internal(
             agent=self._agent,
@@ -97,16 +91,16 @@ class ChatClient:
         - one-shot calls via `send(...)`
         - stateful sessions via `session(...)`
 
-    Initially, only blocking mode is implemented: we send a message and wait for
-    the Dust API to accept it. In a later phase, we'll add assistant aggregation
-    (via conversation events) and streaming.
+    It uses the Conversations *conversation events* stream under the hood to
+    aggregate the assistant's reply in a blocking fashion (no streaming API
+    surface yet).
     """
 
     def __init__(
         self,
         *,
-        conversations: "ConversationsClient",
-        agents: "AgentsClient",
+        conversations: ConversationsClient,
+        agents: AgentsClient,
         config: DustConfig,
     ) -> None:
         self._conversations = conversations
@@ -126,30 +120,31 @@ class ChatClient:
         timezone: Optional[str] = None,
         conversation_id: Optional[str] = None,
         title: Optional[str] = None,
+        timeout: Optional[float] = None,
     ) -> ChatResponse:
         """
         One-shot chat call.
 
         - If `conversation_id` is None, this creates a new conversation.
         - Otherwise, it sends the message in the existing conversation.
-        - Uses `blocking=True` on the Conversations API to ensure the agent
-          finishes processing before returning (even though we don't yet
-          aggregate its reply).
+        - It then streams conversation events and aggregates the assistant reply.
 
         Args:
-            agent: Agent configuration sId (e.g. "dust", "i5cIwRsG0u").
+            agent: Agent configuration sId (e.g. "dust", "helper", "i5cIwRsG0u").
             text: User message content.
             username: Logical username for this user (required by Dust in most workspaces).
-            timezone: Optional timezone; if None, may fall back to config defaults
-                      in a future iteration.
+            timezone: Optional timezone.
             conversation_id: Optional existing conversation sId.
             title: Optional conversation title (only used when creating a new conversation).
+            timeout: Optional override for how long to wait for events.
+                     Defaults to `config.timeout` if not provided.
 
         Returns:
-            ChatResponse describing the user message and conversation_id.
+            ChatResponse with both the user message and (if available)
+            the assistant reply.
 
         Raises:
-            DustError / DustAPIError on API failures.
+            DustError / DustAPIError / ChatError on failures.
         """
         return self._send_internal(
             agent=agent,
@@ -158,6 +153,7 @@ class ChatClient:
             timezone=timezone,
             conversation_id=conversation_id,
             title=title,
+            timeout=timeout or self._config.timeout,
         )
 
     def session(
@@ -210,6 +206,7 @@ class ChatClient:
         timezone: Optional[str],
         conversation_id: Optional[str],
         title: Optional[str],
+        timeout: float,
     ) -> ChatResponse:
         """
         Core implementation used by both ChatClient.send and ChatSession.send.
@@ -217,11 +214,9 @@ class ChatClient:
         It:
           - ensures we have a conversationId
           - builds MessageContext + MessageMention
-          - calls ConversationsClient.create_message with blocking=True
-          - wraps the resulting Message into ChatMessage / ChatResponse
-
-        For now, only the user message is exposed. Assistant message aggregation
-        will come later once we build on top of conversation events.
+          - calls ConversationsClient.create_message
+          - streams conversation events to build the assistant reply
+          - wraps everything into ChatResponse
         """
         # 1) Ensure conversation exists
         conv_id = conversation_id
@@ -251,29 +246,161 @@ class ChatClient:
             context=mention_context,
         )
 
-        # 3) Create the message (blocking)
+        # 3) Create the user message
         msg: Message = self._conversations.create_message(
             conversation_id=conv_id,
             content=text,
             mentions=[mention],
             context=msg_context,
-            blocking=True,
         )
 
-        # 4) Wrap as high-level ChatMessage
+        # 4) Wrap user message
         user_chat_msg = ChatMessage(
             role="user",
-            text=msg.content,
+            text=msg.content or "",
             message_id=msg.sId,
             conversation_id=conv_id,
         )
 
-        # NOTE:
-        # - assistant_message is left as None for now.
-        # - once we wire events ("Get the events for a conversation" / message events),
-        #   we'll be able to attach a proper assistant ChatMessage as well.
+        # 5) Stream events to build assistant reply
+        assistant_chat_msg = self._wait_for_assistant_reply(
+            conversation_id=conv_id,
+            user_message_id=msg.sId,
+            timeout=timeout,
+        )
+
         return ChatResponse(
             conversation_id=conv_id,
             user_message=user_chat_msg,
-            assistant_message=None,
+            assistant_message=assistant_chat_msg,
+        )
+
+    # ------------------------------------------------------------------
+    # Internal: streaming conversation events
+    # ------------------------------------------------------------------
+
+    def _wait_for_assistant_reply(
+        self,
+        *,
+        conversation_id: str,
+        user_message_id: str,
+        timeout: float,
+    ) -> Optional[ChatMessage]:
+        """
+        Wait for the assistant reply corresponding to `user_message_id`.
+
+        Strategy:
+          - Stream conversation events via ConversationsClient.stream_events.
+          - First, detect the *agent* message id whose parentMessageId == user_message_id.
+          - Then wait until we see AGENT_MESSAGE_DONE or AGENT_ERROR for that agent message.
+          - Once done, re-fetch the conversation and extract the agent's text reply.
+
+        Returns:
+            ChatMessage for the assistant reply, or None if nothing
+            could be gathered before timeout.
+
+        Raises:
+            ChatError on agent_error or streaming failures.
+        """
+        deadline = time.time() + timeout
+
+        agent_message_id: Optional[str] = None
+        done = False
+
+        try:
+            for event in self._conversations.stream_events(
+                conversation_id,
+                timeout=timeout,
+            ):
+                # Manual timeout guard (stream itself also has a timeout).
+                if time.time() > deadline:
+                    break
+
+                etype = event.type
+                # In case anything funky happens, normalise to string.
+                if isinstance(etype, ConversationEventType):
+                    etype_value = etype.value
+                else:
+                    etype_value = str(etype or "")
+
+                # --- Step 1: find the agent message linked to this user message ---
+                if (
+                    etype_value == ConversationEventType.AGENT_MESSAGE_NEW.value
+                    and event.message is not None
+                ):
+                    parent_id = getattr(event.message, "parentMessageId", None)
+                    if parent_id == user_message_id:
+                        agent_message_id = event.message.sId
+
+                # Until we know which agent message we're following, skip.
+                if agent_message_id is None:
+                    continue
+
+                # From here on, we only care about events for this agent message.
+                if event.messageId != agent_message_id:
+                    continue
+
+                # --- Step 2: stop on done or error ---
+                if etype_value == ConversationEventType.AGENT_ERROR.value:
+                    err = getattr(event, "error", None)
+                    if isinstance(err, dict):
+                        msg = err.get("message") or repr(err)
+                    else:
+                        msg = str(err) if err is not None else "Unknown agent error"
+                    raise ChatError(
+                        f"Agent error while generating reply: {msg}"
+                    )
+
+                if etype_value == ConversationEventType.AGENT_MESSAGE_DONE.value:
+                    done = True
+                    break
+
+        except ChatError:
+            # Already a high-level chat error, just bubble up.
+            raise
+        except Exception as exc:
+            # Wrap any lower-level streaming / parsing errors.
+            raise ChatError(
+                f"Error while streaming assistant reply: {exc}"
+            ) from exc
+
+        # If we never even discovered an agent message, there's nothing to return.
+        if agent_message_id is None:
+            return None
+
+        # At this point, either:
+        # - done == True (we saw AGENT_MESSAGE_DONE), or
+        # - we timed out but did at least see an AGENT_MESSAGE_NEW.
+        # In both cases, we can try to read the latest conversation state.
+        conv = self._conversations.get(conversation_id)
+
+        # `conv.content` is a nested list of raw message dicts; we'll scan those.
+        assistant_text: str = ""
+        content_blocks = getattr(conv, "content", []) or []
+
+        for block in content_blocks:
+            if not isinstance(block, list):
+                continue
+            for obj in block:
+                if not isinstance(obj, dict):
+                    continue
+                if (
+                    obj.get("sId") == agent_message_id
+                    and obj.get("type") == "agent_message"
+                ):
+                    assistant_text = obj.get("content") or ""
+                    break
+            if assistant_text:
+                break
+
+        if not assistant_text:
+            # Could be a race or an agent that produced no text; in that
+            # case we just return None, same as "no reply".
+            return None
+
+        return ChatMessage(
+            role="assistant",
+            text=assistant_text,
+            message_id=agent_message_id,
+            conversation_id=conversation_id,
         )

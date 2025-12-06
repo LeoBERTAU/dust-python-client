@@ -1,7 +1,10 @@
 # examples/chat.py
 
 from dotenv import load_dotenv
+
 from dust_client import DustClient, DustConfig
+
+AGENT_SID = "gpt-5-nano"
 
 def main() -> None:
     load_dotenv()
@@ -10,30 +13,24 @@ def main() -> None:
 
     client.validate()
 
-    # One-shot
     resp = client.chat.send(
-        agent="dust",              # agent sId
+        agent=AGENT_SID,
         text="Hello from ChatClient!",
-        username="leo",
+        username="leo",  # or whatever makes sense in your workspace
         timezone="Europe/Paris",
-    )
-    print("Conversation:", resp.conversation_id)
-    print("User:", resp.user_message.text)
-    print("Assistant:", resp.assistant_message)  # currently None
-
-    # Session
-    session = client.chat.session(
-        agent="dust",
-        username="leo",
-        timezone="Europe/Paris",
-        title="ChatClient test",
+        title="ChatClient demo",
     )
 
-    r2 = session.send("Can you summarize what ChatClient does?")
-    print("Session conversation:", r2.conversation_id)
-    print("User:", r2.user_message.text)
+    print("Conversation ID:", resp.conversation_id)
+    print("User message:", resp.user_message.text)
+
+    if resp.assistant_message:
+        print("Assistant message:", resp.assistant_message.text)
+    else:
+        print("Assistant message: <none>")
 
     client.close()
+
 
 if __name__ == "__main__":
     main()

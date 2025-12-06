@@ -12,6 +12,7 @@ from .exceptions import (
     DustServerError,
 )
 from .chat.client import ChatClient, ChatSession
+from .chat.models import ChatMessage, ChatResponse
 
 __all__ = [
     "DustClient",
@@ -27,4 +28,6 @@ __all__ = [
     "DustServerError",
     "ChatClient",
     "ChatSession",
+    "ChatMessage",
+    "ChatResponse",
 ]

@@ -37,7 +37,7 @@ class DustConfig(BaseModel):
         description="OAuth access token, alternative to api_key.",
     )
     timeout: float = Field(
-        default=10.0,
+        default=60.0,
         description="Default request timeout in seconds.",
     )
 
@@ -66,7 +66,7 @@ class DustConfig(BaseModel):
         workspace_id = overrides.get("workspace_id") or os.getenv("DUST_WORKSPACE_ID")
         api_key = overrides.get("api_key") or os.getenv("DUST_API_KEY")
         access_token = overrides.get("access_token") or os.getenv("DUST_ACCESS_TOKEN")
-        timeout = float(overrides.get("timeout") or os.getenv("DUST_TIMEOUT", "10.0"))
+        timeout = float(overrides.get("timeout") or os.getenv("DUST_TIMEOUT", "60.0"))
 
         if not workspace_id:
             raise ValidationError.from_exception_data(

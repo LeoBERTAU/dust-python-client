@@ -1,4 +1,4 @@
-# dust_sdk/agents/client.py
+# dust_client/agents/client.py
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, List

@@ -1,4 +1,4 @@
-# dust_sdk/agents/models.py
+# dust_client/agents/models.py
 
 from __future__ import annotations
 

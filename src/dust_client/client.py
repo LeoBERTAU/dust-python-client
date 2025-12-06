@@ -1,4 +1,4 @@
-# dust_sdk/client.py
+# dust_client/client.py
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ class DustClient:
     Synchronous Dust API client.
 
     Example:
-        from dust_sdk import DustClient, DustConfig
+        from dust_client import DustClient, DustConfig
 
         config = DustConfig(
             workspace_id="YOUR_WORKSPACE_ID",

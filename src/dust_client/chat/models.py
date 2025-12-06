@@ -1,4 +1,4 @@
-# dust_sdk/chat/models.py
+# dust_client/chat/models.py
 
 from __future__ import annotations
 
@@ -27,13 +27,13 @@ class ChatMessage(BaseModel):
 
 class ChatResponse(BaseModel):
     """
-    Response returned by ChatClient when using blocking (non-streaming) calls.
+    Response returned by ChatClient for blocking chat calls.
 
-    For now, we reliably expose the user message and conversation_id.
-    The assistant_message field is reserved for future use, once we wire
-    conversation events / agent message aggregation.
+    We always expose the user message and conversation_id.
+    The assistant_message is included when we can successfully aggregate it
+    from conversation events (it may be None on timeouts or certain errors).
     """
-
+    ...
     model_config = ConfigDict(extra="allow")
 
     conversation_id: str = Field(

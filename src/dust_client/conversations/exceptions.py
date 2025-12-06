@@ -1,4 +1,4 @@
-# dust_sdk/conversations/exceptions.py
+# dust_client/conversations/exceptions.py
 
 from __future__ import annotations
 

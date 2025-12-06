@@ -371,7 +371,7 @@ mention_ctx = MessageMentionContext(
 )
 
 mention = MessageMention(
-    configurationId="dust",   # agent configuration sId
+    configurationId="dust",  # agent configuration sId
     context=mention_ctx,
 )
 

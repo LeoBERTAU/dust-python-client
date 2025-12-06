@@ -1,7 +1,8 @@
-# dust_sdk/conversations/models.py
+# dust_client/conversations/models.py
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, ConfigDict
@@ -47,6 +48,83 @@ class ConversationResponse(BaseModel):
 
     conversation: Conversation
 
+class ConversationEventType(str, Enum):
+    USER_MESSAGE_NEW = "user_message_new"
+    USER_MESSAGE_EDIT = "user_message_edit"
+
+    AGENT_MESSAGE_NEW = "agent_message_new"
+    AGENT_MESSAGE_PROGRESS = "agent_message_progress"   # optional depending on workspace
+    AGENT_MESSAGE_DONE = "agent_message_done"
+    AGENT_ERROR = "agent_error"
+
+    GENERATION_TOKENS = "generation_tokens"  # streaming tokens (agent output)
+
+class ConversationEvent(BaseModel):
+    """
+    A single conversation event, from the `data` field of the SSE payload.
+
+    The raw SSE event looks like:
+    {
+      "eventId": "...",
+      "data": {
+        "type": "user_message_new",
+        "created": 1765043283715,
+        "messageId": "p7accylgUm",
+        "message": { ... }
+      }
+    }
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    type: ConversationEventType = Field(..., description=(
+        "Event type (e.g. user_message_new, agent_message_new, "
+        "agent_message_done, generation_tokens, agent_error)."
+    ))
+    created: Optional[int] = Field(
+        default=None,
+        description="Event creation timestamp (ms since epoch).",
+    )
+    messageId: Optional[str] = Field(
+        default=None,
+        description="Related message sId, if any.",
+    )
+    # `message` uses the existing Message model; extra fields are allowed.
+    message: Optional[Message] = None
+
+
+class ConversationEventEnvelope(BaseModel):
+    """
+    Envelope for SSE conversation events.
+
+    Shape:
+
+    {
+      "eventId": "1765043283716-0",
+      "data": { ... ConversationEvent ... }
+    }
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    eventId: str
+    data: ConversationEvent
+
+
+class ConversationEventsResponse(BaseModel):
+    """
+    Envelope for conversation or message events:
+
+        {
+          "events": [ { ... }, ... ]
+        }
+
+    We expose raw ConversationEvent objects and allow extra fields.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    events: List[ConversationEvent]
 
 # ---------------------------------------------------------------------------
 # Message-related models
@@ -136,8 +214,34 @@ class CreateMessagePayload(BaseModel):
     content: str
     mentions: List[MessageMention]
     context: Optional[MessageContext] = None
-    blocking: Optional[bool] = None
 
+
+class CancelMessagesPayload(BaseModel):
+    """
+    Request payload for POST
+      /assistant/conversations/{cId}/cancel
+
+    The endpoint accepts MULTIPLE message IDs.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    messageIds: List[str]
+
+class CancelMessagesResponse(BaseModel):
+    """
+    Minimal typed response for the cancel endpoint.
+
+    Dust currently returns something like:
+
+        { "success": true }
+
+    We allow extra keys to remain forward-compatible.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    success: bool = Field(..., description="Whether the cancel operation succeeded.")
 
 class Message(BaseModel):
     """
@@ -179,3 +283,4 @@ class MessageResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     message: Message
+

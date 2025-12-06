@@ -1,4 +1,4 @@
-# dust_sdk/exceptions.py
+# dust_client/exceptions.py
 
 from __future__ import annotations
 
