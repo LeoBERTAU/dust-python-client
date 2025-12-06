@@ -44,6 +44,7 @@ license-files = []
 where = ["src"]
 
 [tool.pytest.ini_options]
+pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.ruff]
