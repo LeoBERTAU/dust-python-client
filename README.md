@@ -458,3 +458,4 @@ See [`LICENSE`](LICENSE) for details.
 - This is an **unofficial** SDK, built by the community.
 - Always refer to the official Dust documentation for the most accurate and up-to-date API reference: <https://docs.dust.tt>
 - Feedback, issues, and PRs are very welcome at: <https://github.com/LeoBERTAU/dust-python-client>
+
