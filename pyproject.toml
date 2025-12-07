@@ -2,12 +2,13 @@
 name = "dust-client"
 version = "0.1.0"
 description = "Unofficial Python Client for Dust (dust.tt)"
-authors = [
-    { name = "Leo Bertau", email = "leobertau@hotmail.fr" }
-]
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
+
+authors = [
+    { name = "Leo Bertau", email = "leobertau@hotmail.fr" }
+]
 
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -22,13 +23,15 @@ classifiers = [
 dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
+    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "ruff",
+    "pytest-cov",
     "python-dotenv",
+    "ruff",
 ]
 
 [project.urls]
@@ -36,9 +39,13 @@ Homepage = "https://github.com/LeoBERTAU/dust-python-client"
 Repository = "https://github.com/LeoBERTAU/dust-python-client"
 Issues = "https://github.com/LeoBERTAU/dust-python-client/issues"
 
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
-license-files = []
+license-files = ["LICENSE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -51,6 +58,3 @@ testpaths = ["tests"]
 line-length = 88
 target-version = "py39"
 
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
