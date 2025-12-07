@@ -35,6 +35,7 @@ class Conversation(BaseModel):
         description="Creation timestamp in milliseconds since epoch.",
     )
 
+
 class ConversationResponse(BaseModel):
     """
     Envelope used by the API for conversation responses:
@@ -48,16 +49,18 @@ class ConversationResponse(BaseModel):
 
     conversation: Conversation
 
+
 class ConversationEventType(str, Enum):
     USER_MESSAGE_NEW = "user_message_new"
     USER_MESSAGE_EDIT = "user_message_edit"
 
     AGENT_MESSAGE_NEW = "agent_message_new"
-    AGENT_MESSAGE_PROGRESS = "agent_message_progress"   # optional depending on workspace
+    AGENT_MESSAGE_PROGRESS = "agent_message_progress"  # optional depending on workspace
     AGENT_MESSAGE_DONE = "agent_message_done"
     AGENT_ERROR = "agent_error"
 
     GENERATION_TOKENS = "generation_tokens"  # streaming tokens (agent output)
+
 
 class ConversationEvent(BaseModel):
     """
@@ -77,10 +80,13 @@ class ConversationEvent(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
-    type: ConversationEventType = Field(..., description=(
-        "Event type (e.g. user_message_new, agent_message_new, "
-        "agent_message_done, generation_tokens, agent_error)."
-    ))
+    type: ConversationEventType = Field(
+        ...,
+        description=(
+            "Event type (e.g. user_message_new, agent_message_new, "
+            "agent_message_done, generation_tokens, agent_error)."
+        ),
+    )
     created: Optional[int] = Field(
         default=None,
         description="Event creation timestamp (ms since epoch).",
@@ -126,6 +132,7 @@ class ConversationEventsResponse(BaseModel):
 
     events: List[ConversationEvent]
 
+
 # ---------------------------------------------------------------------------
 # Message-related models
 # ---------------------------------------------------------------------------
@@ -147,7 +154,6 @@ class MessageMentionContext(BaseModel):
 
     timezone: Optional[str] = None
     modelSettings: Optional[Dict[str, Any]] = None
-
 
 
 class MessageMention(BaseModel):
@@ -228,6 +234,7 @@ class CancelMessagesPayload(BaseModel):
 
     messageIds: List[str]
 
+
 class CancelMessagesResponse(BaseModel):
     """
     Minimal typed response for the cancel endpoint.
@@ -242,6 +249,7 @@ class CancelMessagesResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     success: bool = Field(..., description="Whether the cancel operation succeeded.")
+
 
 class Message(BaseModel):
     """
@@ -283,4 +291,3 @@ class MessageResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     message: Message
-

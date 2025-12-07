@@ -7,9 +7,10 @@ from dust_client.conversations.models import (
     MessageMention,
     MessageMentionContext,
     MessageContext,
-    ConversationEventType
+    ConversationEventType,
 )
 from dust_client.exceptions import DustBadRequestError
+
 
 def main() -> None:
     load_dotenv()
@@ -73,8 +74,8 @@ def main() -> None:
 
         # stop after we observe the final agent output
         if event.type in (
-                ConversationEventType.AGENT_MESSAGE_DONE,
-                ConversationEventType.AGENT_ERROR,
+            ConversationEventType.AGENT_MESSAGE_DONE,
+            ConversationEventType.AGENT_ERROR,
         ):
             break
 

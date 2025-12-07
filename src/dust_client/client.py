@@ -35,12 +35,12 @@ class DustClient:
     """
 
     def __init__(
-            self,
-            config: DustConfig,
-            *,
-            client: Optional[httpx.Client] = None,
-            user_agent_suffix: Optional[str] = None,
-            validate_on_init: bool = False,
+        self,
+        config: DustConfig,
+        *,
+        client: Optional[httpx.Client] = None,
+        user_agent_suffix: Optional[str] = None,
+        validate_on_init: bool = False,
     ) -> None:
         self._config = config
 
@@ -101,13 +101,13 @@ class DustClient:
     # ------------------------------------------------------------------
 
     def request(
-            self,
-            method: str,
-            path: str,
-            *,
-            params: Optional[Dict[str, Any]] = None,
-            json: Optional[Dict[str, Any]] = None,
-            parse_json: bool = True,
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        parse_json: bool = True,
     ) -> Any:
         """
         Internal helper to call the Dust HTTP API.
@@ -175,19 +175,19 @@ class DustClient:
                 err = payload["error"]
                 code = err.get("code") or err.get("type") or None
                 message = (
-                        err.get("message")
-                        or err.get("detail")
-                        or err.get("error")
-                        or message
+                    err.get("message")
+                    or err.get("detail")
+                    or err.get("error")
+                    or message
                 )
             else:
                 # Or flat: { "code": "...", "message": "...", ... }
                 code = payload.get("code") or payload.get("error")
                 message = (
-                        payload.get("message")
-                        or payload.get("detail")
-                        or payload.get("error_description")
-                        or message
+                    payload.get("message")
+                    or payload.get("detail")
+                    or payload.get("error_description")
+                    or message
                 )
 
         ErrorClass = map_status_to_error(status)
@@ -228,7 +228,6 @@ class DustClient:
             json=json,
             parse_json=parse_json,
         )
-
 
     # ------------------------------------------------------------------
     # Validation

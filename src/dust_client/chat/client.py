@@ -347,9 +347,7 @@ class ChatClient:
                         msg = err.get("message") or repr(err)
                     else:
                         msg = str(err) if err is not None else "Unknown agent error"
-                    raise ChatError(
-                        f"Agent error while generating reply: {msg}"
-                    )
+                    raise ChatError(f"Agent error while generating reply: {msg}")
 
                 if etype_value == ConversationEventType.AGENT_MESSAGE_DONE.value:
                     done = True
@@ -360,9 +358,7 @@ class ChatClient:
             raise
         except Exception as exc:
             # Wrap any lower-level streaming / parsing errors.
-            raise ChatError(
-                f"Error while streaming assistant reply: {exc}"
-            ) from exc
+            raise ChatError(f"Error while streaming assistant reply: {exc}") from exc
 
         # If we never even discovered an agent message, there's nothing to return.
         if not done or agent_message_id is None:

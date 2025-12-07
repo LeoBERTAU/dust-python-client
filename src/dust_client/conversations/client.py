@@ -175,20 +175,18 @@ class ConversationsClient:
         try:
             env = MessageResponse.model_validate(data)
         except ValidationError as exc:
-            raise ConversationError(
-                f"Failed to parse message response: {exc}"
-            ) from exc
+            raise ConversationError(f"Failed to parse message response: {exc}") from exc
 
         return env.message
 
     def edit_message(
-            self,
-            conversation_id: str,
-            message_id: str,
-            *,
-            content: Optional[str] = None,
-            mentions: Sequence[MessageMention],
-            extra: Optional[Dict[str, Any]] = None,
+        self,
+        conversation_id: str,
+        message_id: str,
+        *,
+        content: Optional[str] = None,
+        mentions: Sequence[MessageMention],
+        extra: Optional[Dict[str, Any]] = None,
     ) -> Message:
         """
         Edit an existing message in a conversation.
@@ -344,4 +342,3 @@ class ConversationsClient:
             path=path,
             timeout=effective_timeout,
         )
-

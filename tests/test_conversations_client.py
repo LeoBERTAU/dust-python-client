@@ -11,7 +11,9 @@ from dust_client.conversations.models import (
 )
 
 
-def test_create_conversation_builds_correct_request(dummy_dust_client, conversations_client):
+def test_create_conversation_builds_correct_request(
+    dummy_dust_client, conversations_client
+):
     dummy_dust_client.set_response(
         "POST",
         "/assistant/conversations",
@@ -40,7 +42,9 @@ def test_create_conversation_builds_correct_request(dummy_dust_client, conversat
     assert call["json"]["blocking"] is True
 
 
-def test_create_message_builds_payload_and_parses_response(dummy_dust_client, conversations_client):
+def test_create_message_builds_payload_and_parses_response(
+    dummy_dust_client, conversations_client
+):
     conv_id = "conv123"
     path = f"/assistant/conversations/{conv_id}/messages"
 

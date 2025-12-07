@@ -92,9 +92,7 @@ class AgentsClient:
         try:
             resp = GetAgentResponse.model_validate(data)
         except ValidationError as e:
-            raise DustError(
-                f"Failed to parse get agent response: {e}"
-            ) from e
+            raise DustError(f"Failed to parse get agent response: {e}") from e
 
         return resp.agentConfiguration
 
@@ -135,9 +133,7 @@ class AgentsClient:
         try:
             resp = GetAgentResponse.model_validate(data)
         except ValidationError as e:
-            raise DustError(
-                f"Failed to parse update agent response: {e}"
-            ) from e
+            raise DustError(f"Failed to parse update agent response: {e}") from e
 
         return resp.agentConfiguration
 
@@ -167,9 +163,7 @@ class AgentsClient:
         try:
             resp = ListAgentsResponse.model_validate(data)
         except ValidationError as e:
-            raise DustError(
-                f"Failed to parse search agents response: {e}"
-            ) from e
+            raise DustError(f"Failed to parse search agents response: {e}") from e
 
         return resp.agentConfigurations
 

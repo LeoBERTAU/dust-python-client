@@ -11,6 +11,7 @@ client = DustClient(config)
 
 client.validate()
 
+
 def list_agents() -> None:
     try:
         agents = client.agents.list()
@@ -23,6 +24,7 @@ def list_agents() -> None:
         if e.details:
             print("Details:", e.details)
 
+
 def get_agent(agent_id: str) -> None:
     try:
         agent = client.agents.get(agent_id)
@@ -31,6 +33,7 @@ def get_agent(agent_id: str) -> None:
         print("Dust API error:", e)
         if e.details:
             print("Details:", e.details)
+
 
 def search_agent_by_name(name: str) -> None:
     try:
@@ -41,9 +44,9 @@ def search_agent_by_name(name: str) -> None:
         if e.details:
             print("Details:", e.details)
 
+
 if __name__ == "__main__":
     list_agents()
     get_agent("i5cIwRsG0u")
     client.agents.get("i5cIwRsG0")
     search_agent_by_name("promptWriter")
-

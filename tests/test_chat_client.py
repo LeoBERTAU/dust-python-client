@@ -129,7 +129,9 @@ def test_chat_send_creates_conv_and_aggregates_reply(chat_client, monkeypatch):
 
     # Wire these patches into the ChatClient's conversations instance
     monkeypatch.setattr(chat_client._conversations, "create", fake_create)
-    monkeypatch.setattr(chat_client._conversations, "create_message", fake_create_message)
+    monkeypatch.setattr(
+        chat_client._conversations, "create_message", fake_create_message
+    )
     monkeypatch.setattr(chat_client._conversations, "stream_events", fake_stream_events)
     monkeypatch.setattr(chat_client._conversations, "get", fake_get)
 
@@ -164,7 +166,11 @@ def test_chat_send_requires_username(chat_client, monkeypatch):
     # Return a minimal conversation object when create() is called.
     conv_stub = SimpleNamespace(sId="conv_stub")
 
-    monkeypatch.setattr(chat_client._conversations, "create", lambda title=None, blocking=True, extra=None: conv_stub)
+    monkeypatch.setattr(
+        chat_client._conversations,
+        "create",
+        lambda title=None, blocking=True, extra=None: conv_stub,
+    )
 
     with pytest.raises(DustError):
         chat_client.send(

@@ -66,7 +66,9 @@ def conversations_client(dummy_dust_client: DummyDustClient) -> ConversationsCli
 
 
 @pytest.fixture
-def chat_client(conversations_client: ConversationsClient, dummy_config: DustConfig) -> ChatClient:
+def chat_client(
+    conversations_client: ConversationsClient, dummy_config: DustConfig
+) -> ChatClient:
     # AgentsClient isn’t used by ChatClient right now; pass None / dummy.
     class DummyAgentsClient:
         pass

@@ -45,7 +45,6 @@ def stream_sse_json(
             headers={"Accept": "text/event-stream"},
             timeout=timeout,
         ) as resp:
-
             if resp.status_code != 200:
                 # Try reading body for diagnostics
                 try:
@@ -70,7 +69,7 @@ def stream_sse_json(
 
                     # SSE style: "data: {...}"
                     if line.startswith("data:"):
-                        data_str = line[len("data:"):].strip()
+                        data_str = line[len("data:") :].strip()
                     else:
                         # NDJSON style — whole line is JSON
                         data_str = line

@@ -112,11 +112,13 @@ class ListAgentsResponse(BaseModel):
     """
     Response wrapper for list agents API.
     """
+
     agentConfigurations: List[AgentConfiguration]
+
 
 class GetAgentResponse(BaseModel):
     """
     Response wrapper for get agents API.
     """
-    agentConfiguration: AgentConfiguration
 
+    agentConfiguration: AgentConfiguration

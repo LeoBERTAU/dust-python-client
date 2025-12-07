@@ -11,4 +11,5 @@ class ConversationError(DustError):
     fails due to invalid payloads, unexpected API response shapes,
     or Pydantic validation errors.
     """
+
     pass

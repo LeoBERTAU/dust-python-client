@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional, Type
 # Base SDK exceptions
 # ---------------------------------------------------------------------------
 
+
 class DustError(Exception):
     """Base exception for all Dust SDK errors."""
 
@@ -50,6 +51,7 @@ class DustAPIError(DustError):
 # ---------------------------------------------------------------------------
 # HTTP status–based subclasses
 # ---------------------------------------------------------------------------
+
 
 class DustBadRequestError(DustAPIError):
     """400 Bad Request"""

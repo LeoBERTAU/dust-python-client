@@ -22,7 +22,9 @@ class ChatMessage(BaseModel):
     )
     text: str = Field(..., description="Message text content.")
     message_id: str = Field(..., description="Underlying Dust message sId.")
-    conversation_id: str = Field(..., description="Conversation sId this message belongs to.")
+    conversation_id: str = Field(
+        ..., description="Conversation sId this message belongs to."
+    )
 
 
 class ChatResponse(BaseModel):
@@ -33,6 +35,7 @@ class ChatResponse(BaseModel):
     The assistant_message is included when we can successfully aggregate it
     from conversation events (it may be None on timeouts or certain errors).
     """
+
     ...
     model_config = ConfigDict(extra="allow")
 

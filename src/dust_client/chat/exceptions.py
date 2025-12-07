@@ -10,4 +10,5 @@ class ChatError(DustError):
     High-level errors raised by ChatClient when something goes wrong while
     streaming / aggregating the assistant's reply.
     """
+
     pass

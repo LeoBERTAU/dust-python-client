@@ -6,6 +6,7 @@ from dust_client import DustClient, DustConfig
 
 AGENT_SID = "gpt-5-nano"
 
+
 def main() -> None:
     load_dotenv()
     config = DustConfig.from_env()
