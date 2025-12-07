@@ -365,7 +365,9 @@ class ChatClient:
             ) from exc
 
         # If we never even discovered an agent message, there's nothing to return.
-        if agent_message_id is None:
+        if not done or agent_message_id is None:
+            # No assistant content found within timeout or no agent
+            # message linked to this user message.
             return None
 
         # At this point, either:

@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Iterator, Dict, Any
+from typing import Iterator
 from types import SimpleNamespace
 
 import pytest
 
 from dust_client.chat.models import ChatResponse
-from dust_client.chat.exceptions import ChatError
 from dust_client.conversations.models import (
     Conversation,
     Message,
     MessageMention,
-    MessageMentionContext,
     MessageContext,
     ConversationEvent,
     ConversationEventType,
