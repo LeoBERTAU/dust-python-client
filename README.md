@@ -1,5 +1,10 @@
 
-# Dust SDK for Python (Unofficial)
+# Dust Client for Python (Unofficial)
+
+[![PyPI version](https://img.shields.io/pypi/v/dust-client.svg)](https://pypi.org/project/dust-client/)
+[![Python versions](https://img.shields.io/pypi/pyversions/dust-client.svg)](https://pypi.org/project/dust-client/)
+[![CI](https://github.com/LeoBERTAU/dust-python-client/actions/workflows/ci.yml/badge.svg)](https://github.com/LeoBERTAU/dust-python-client/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A Python client for the [Dust Developer Platform](https://dust.tt).  
 This SDK provides Python-friendly access to Dust’s **Agents**, **Conversations**, and (eventually) other API endpoints.
